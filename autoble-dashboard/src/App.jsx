@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import LandingPage from "./LandingPage";
 
 // ─── Responsive Hook ──────────────────────────────────────────────────────────
 function useBreakpoint() {
@@ -210,9 +211,9 @@ function CheckRow({ item, detected, rssiData, isMobile }) {
   );
 }
 
-// ─── Main App ─────────────────────────────────────────────────────────────────
-export default function App() {
-  const { isMobile, isTablet, isDesktop } = useBreakpoint();
+// ─── Dashboard — all hooks safely inside its own component ────────────────────
+function Dashboard() {
+  const { isMobile, isTablet } = useBreakpoint();
   const [tab, setTab] = useState("dashboard");
   const [rssiData, setRssiData] = useState({});
   const [detected, setDetected] = useState(new Set());
@@ -282,14 +283,12 @@ export default function App() {
       display: "flex", flexDirection: "column",
       overflow: "auto",
     }}>
-      {/* BG */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none",
         backgroundImage: "linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px)",
         backgroundSize: "48px 48px" }} />
       <div style={{ position: "fixed", top: -200, left: -200, width: 600, height: 600, borderRadius: "50%",
         background: "radial-gradient(circle,rgba(59,130,246,0.06) 0%,transparent 70%)", zIndex: 0, pointerEvents: "none" }} />
 
-      {/* ── HEADER ── */}
       <header style={{
         position: "sticky", top: 0, zIndex: 100,
         display: "flex", alignItems: "center",
@@ -302,7 +301,6 @@ export default function App() {
         borderBottom: "1px solid rgba(59,130,246,0.15)",
         backdropFilter: "blur(12px)",
       }}>
-        {/* Logo + status */}
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 20, flexWrap: "wrap" }}>
           <div style={{ fontSize: isMobile ? 18 : 22, fontWeight: 900, letterSpacing: -1 }}>
             Auto<span style={{ color: "#3b82f6" }}>BLE</span>
@@ -321,7 +319,6 @@ export default function App() {
           )}
         </div>
 
-        {/* Tabs */}
         <div style={{
           display: "flex", gap: 4,
           background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: 4,
@@ -340,7 +337,6 @@ export default function App() {
           ))}
         </div>
 
-        {/* Right */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {!isMobile && (
             <div style={{ textAlign: "right" }}>
@@ -359,7 +355,6 @@ export default function App() {
         </div>
       </header>
 
-      {/* Toast */}
       {toast && (
         <div style={{
           position: "fixed", top: isMobile ? 70 : 80, left: "50%", transform: "translateX(-50%)",
@@ -372,10 +367,8 @@ export default function App() {
         </div>
       )}
 
-      {/* ── CONTENT ── */}
       <main style={{ flex: 1, position: "relative", zIndex: 1, padding: `20px ${px}px 32px` }}>
 
-        {/* ══ DASHBOARD ══ */}
         {tab === "dashboard" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 12 }}>
@@ -386,7 +379,6 @@ export default function App() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "280px 1fr 220px", gap: 16 }}>
-              {/* Progress ring */}
               <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(59,130,246,0.12)", borderRadius: 20, padding: 20, display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
                 <div style={{ fontSize: 10, color: "#475569", letterSpacing: 3, fontWeight: 700, alignSelf: "flex-start" }}>VERIFICATION STATUS</div>
                 <CircularProgress found={found} total={total} size={isMobile ? 140 : 160} />
@@ -403,7 +395,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Live BLE Feed */}
               <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, padding: 20 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                   <div style={{ fontSize: 10, color: "#475569", letterSpacing: 3, fontWeight: 700 }}>LIVE BLE FEED</div>
@@ -432,7 +423,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Zone summary desktop */}
               {!isMobile && (
                 <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, padding: 20 }}>
                   <div style={{ fontSize: 10, color: "#475569", letterSpacing: 3, fontWeight: 700, marginBottom: 16 }}>ZONE STATUS</div>
@@ -456,7 +446,6 @@ export default function App() {
               )}
             </div>
 
-            {/* Zone summary mobile */}
             {isMobile && (
               <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: 16 }}>
                 <div style={{ fontSize: 10, color: "#475569", letterSpacing: 3, fontWeight: 700, marginBottom: 12 }}>ZONE STATUS</div>
@@ -481,7 +470,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Missing */}
             <div style={{ background: "rgba(239,68,68,0.04)", border: "1px solid rgba(239,68,68,0.12)", borderRadius: 20, padding: 20 }}>
               <div style={{ fontSize: 10, color: "#ef4444", letterSpacing: 3, fontWeight: 700, marginBottom: 12 }}>⚠ MISSING ITEMS</div>
               {missingItems.length === 0 ? (
@@ -503,7 +491,6 @@ export default function App() {
           </div>
         )}
 
-        {/* ══ CHECKLIST ══ */}
         {tab === "checklist" && (
           <div style={{ maxWidth: 900, margin: "0 auto" }}>
             <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
@@ -526,7 +513,6 @@ export default function App() {
           </div>
         )}
 
-        {/* ══ RADAR ══ */}
         {tab === "radar" && (
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr" : "1fr 360px", gap: 20 }}>
             <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(59,130,246,0.15)", borderRadius: 20, padding: 20 }}>
@@ -614,4 +600,15 @@ export default function App() {
       `}</style>
     </div>
   );
+}
+
+// ─── Root App — only ONE hook, no conditional hook issue ─────────────────────
+export default function App() {
+  const [page, setPage] = useState("landing");
+
+  if (page === "landing") {
+    return <LandingPage onEnterDashboard={() => setPage("dashboard")} />;
+  }
+
+  return <Dashboard />;
 }
